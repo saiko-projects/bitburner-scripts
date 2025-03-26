@@ -85,6 +85,7 @@ export async function main(ns: NS) {
   const hosts = getServers(ns)
     .filter(h => ns.hasRootAccess(h) && ns.getServerMaxMoney(h) != 0)
   let i = -1;
+  let offset = 0
   const nextHost = () => hosts[(i = (i + 1) % hosts.length)]
 
 
@@ -168,13 +169,16 @@ export async function main(ns: NS) {
           if (processes.has(server)) continue
           break
         case "purchased":
-          for (const h of hosts) {
+          for (let i = 0; i < hosts.length; i++) {
+            const h = hosts[(i + 1 + offset) % hosts.length]
             if ([...processes.values()].find(v => v.type == "purchased" && v.target == h)) continue
+            offset = i
             host = h
             break
           }
           break
       }
+      if (!host) continue
 
       processes.set(server, {
         target: host,
