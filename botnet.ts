@@ -169,12 +169,11 @@ export async function main(ns: NS) {
           if (processes.has(server)) continue
           break
         case "purchased":
-          for (let i = 0; i < hosts.length; i++) {
-            const h = hosts[(i + 1 + offset) % hosts.length]
-            if ([...processes.values()].find(v => v.type == "purchased" && v.target == h)) continue
-            offset = i
-            host = h
-            break
+          let lastHost = nextHost()
+          host = lastHost
+          while ([...processes.values()].find(v => v.type == "purchased" && v.target == host)) {
+            host = nextHost()
+            if (host == lastHost) break
           }
           break
       }
